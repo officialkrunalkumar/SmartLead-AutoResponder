@@ -1,0 +1,1258 @@
+{
+  "name": "CleverResponder - SmartLead",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c59de1ca-facd-40bc-bc04-352d3914a4af",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2520,
+        -160
+      ],
+      "id": "b2732faa-0acc-4f7f-b55d-3a93760714f7",
+      "name": "Receive Replies",
+      "webhookId": "c59de1ca-facd-40bc-bc04-352d3914a4af"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o3-mini",
+          "mode": "list",
+          "cachedResultName": "O3-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Based on the following email I sent from {{ $json.fromMail }}:\n{{ $json.Sent }}\n\nAnd the following reply I received from {{ $json.toName }} ({{ $json.toMail }}):\n{{ $json.Received }}\n\nUse the content from the attached Google Doc as the primary source for crafting useful and engaging response that is most likely to increase the recipient’s interest or engagement. If specific information required for a response is not available in the document, generate the reply based on what would be most suitable or relevant given the context.\n\nTo write a reply, You need to write it to {{ $json.toName }} and the sender is {{ $json.fromMail }}.\n\nIf the received message is positive and expresses interest, requests more information, or suggests further discussion, include the following Calendly link in the responses to allow the recipient to easily book a call:\n\n{{ $json.meetingLink }}\n\nOnly include the Calendly link if the message shows a clear intent for follow-up or further conversation.\n\nfrom the message I sent, you can extract the receipient name as well. if no name is there, then just write hello, hey or whatever suitable.\n\nJust write the response, no label, no header, just a reply that you have generated. You should only return one best possible reply."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1740,
+        80
+      ],
+      "id": "430c7664-8bb8-4490-b88e-67530691e7ba",
+      "name": "Suggest Replies",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "openAiApi": {
+          "id": "xEGeNQZgWUZ12rbY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f9c1ace5-f2ab-4b3a-abb0-4528b28abff5",
+              "name": "Sent",
+              "value": "={{ $json.body.sent_message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "27e12cf9-9f61-4ceb-8aa8-4f6191e80f51",
+              "name": "Received",
+              "value": "={{ $json.body.reply_message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "461b6638-517d-41d2-a5d3-840544a9a392",
+              "name": "fromMail",
+              "value": "={{ $json.body.from_email }}",
+              "type": "string"
+            },
+            {
+              "id": "28d22ba1-d7c1-4552-8dbd-89ca1164e6fd",
+              "name": "toMail",
+              "value": "={{ $json.body.to_email }}",
+              "type": "string"
+            },
+            {
+              "id": "ef6a9fc0-5c79-46df-a62f-7628dac9a427",
+              "name": "clientID",
+              "value": "={{ $json.body.client_id }}",
+              "type": "number"
+            },
+            {
+              "id": "f15dad14-54ee-4cc8-af98-7b2306b798b5",
+              "name": "campaignID",
+              "value": "={{ $json.body.campaign_id }}",
+              "type": "number"
+            },
+            {
+              "id": "950be8cc-7b49-448d-b5b1-0de5a35f4aed",
+              "name": "campaignName",
+              "value": "={{ $json.body.campaign_name }}",
+              "type": "string"
+            },
+            {
+              "id": "2ea5fd96-1f15-4f88-912c-2a8129bb5fe3",
+              "name": "secretKey",
+              "value": "={{ $json.body.secret_key }}",
+              "type": "string"
+            },
+            {
+              "id": "fca2c39c-91da-4e0f-8dd0-e47c553e6c7c",
+              "name": "sentMessageID",
+              "value": "={{ $json.body.sent_message.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "902dfcfd-5e08-4662-92f7-3e257a1751f8",
+              "name": "replyMessageID",
+              "value": "={{ $json.body.reply_message.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e86a8dfd-28af-424d-a87f-4ceed39880b7",
+              "name": "toName",
+              "value": "={{ $json.body.to_name }}",
+              "type": "string"
+            },
+            {
+              "id": "3341f61b-fa9a-4de3-adc3-3c8a5a76854a",
+              "name": "statsID",
+              "value": "={{ $json.body.stats_id }}",
+              "type": "string"
+            },
+            {
+              "id": "77203d54-0299-495a-9674-337cb8adf21e",
+              "name": "slEmailLeadMapID",
+              "value": "={{ $json.body.sl_email_lead_map_id }}",
+              "type": "number"
+            },
+            {
+              "id": "e6824fce-b618-4bde-aa2a-35a019cf707e",
+              "name": "slEmailLeadID",
+              "value": "={{ $json.body.sl_email_lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7583f439-21ba-4e51-837f-3973504e1814",
+              "name": "apiKey",
+              "value": "403d0b6c-1316-4a5a-97a1-fb2eb10678c1_8iy699n",
+              "type": "string"
+            },
+            {
+              "id": "95987bcc-c89c-4ac3-8ce2-998b9186cae9",
+              "name": "meetingLink",
+              "value": "https://www.calendly.com",
+              "type": "string"
+            },
+            {
+              "id": "a4be3be0-35ee-41f7-812c-a30e5e82dce2",
+              "name": "companyName",
+              "value": "={{ $json.body.from_email.split('@')[1].split('.')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "88100fe3-bb8c-402a-9904-aaf239aeeba0",
+              "name": "CC",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "45689859-9385-41d7-86c4-cf7143917ac7",
+              "name": "BCC",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "6eaa8412-459c-4930-8f67-4b029574e8f5",
+              "name": "body.reply_category",
+              "value": "={{ $json.body.reply_category }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2360,
+        -160
+      ],
+      "id": "a1461025-5b45-4c84-a54f-79b65c4e3c87",
+      "name": "Set Email Body"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/10pzIIsvqPkBtWdyB7dyLdWqciAZUC09qeVQEouDI5s4/edit?tab=t.0"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -1580,
+        300
+      ],
+      "id": "fa5f0de9-4912-41e8-8b79-0a269d733ff9",
+      "name": "cleverviral",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "bsxRVwTpHN07PDiI",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Interested"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5d2e7575-1cf1-4b0b-a71a-ece7e3e432c9",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Meeting Request"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "60526962-c18b-47cc-bada-d76bf03a49e8",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Not Interested"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a46b0bfa-75eb-4161-8578-dd28691cc403",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 4,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Do Not Contact"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "535f7fb7-e9d5-47eb-a7b4-949fa1097ecb",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Information Request"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "30374e8b-0e9c-4e7d-91d6-d50e2a741c2e",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 6,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Out Of Office"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8f847664-96ad-4a8c-8375-bb3c1ed422f3",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Wrong Person"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "80dd852d-af62-4758-a5ae-bf4e13936a59",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 8,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Uncategorizable by Ai"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f06d2358-f29b-4a21-a10c-2c6281070a6c",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 9,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sender Originated Bounce"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "49880d30-6d68-409f-b99d-a06cdbf3d29f",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 7423,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Future Follow Up"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9ea9aca4-7e50-4578-9e78-e3f38268b783",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": 7587,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Auto-Reply"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2e847831-17cd-4ca3-9f54-0e85dd18d746",
+                    "leftValue": "={{ $json.body.reply_category }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Category Not Defined"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2200,
+        -340
+      ],
+      "id": "e52a240f-dffc-4b0d-add5-5a3d5e95e3e9",
+      "name": "Route Reply"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "be77d973-7f1c-4338-91dd-a532a3812226",
+              "name": "meetingReply",
+              "value": "=Hey {{ $json.toName }},\nPlease use the following link to book sometime.\n{{ $json.meetingLink }}\nTalk soon!",
+              "type": "string"
+            },
+            {
+              "id": "d529606d-aab4-4502-aaa4-c5a687eb79bd",
+              "name": "statsID",
+              "value": "={{ $json.statsID }}",
+              "type": "string"
+            },
+            {
+              "id": "7b6e8f5e-9dd2-4be0-9a8a-a4bc2f554d06",
+              "name": "replyMessageID",
+              "value": "={{ $json.replyMessageID }}",
+              "type": "string"
+            },
+            {
+              "id": "556bb091-fac6-4687-9edf-a5c715fa123e",
+              "name": "timeReplied",
+              "value": "={{ $('Receive Replies').item.json.body.time_replied }}",
+              "type": "string"
+            },
+            {
+              "id": "c9dd0f29-2e0c-46f4-8929-b46f74a49843",
+              "name": "Received",
+              "value": "={{ $json.Received }}",
+              "type": "string"
+            },
+            {
+              "id": "360c5b31-1c73-4244-979a-c24036ea963e",
+              "name": "CC",
+              "value": "={{ $json.CC }}",
+              "type": "string"
+            },
+            {
+              "id": "7d3ff626-82f6-4901-913e-06d0e221bb19",
+              "name": "BCC",
+              "value": "={{ $json.BCC }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1680,
+        -320
+      ],
+      "id": "47ab59e1-7703-4e38-b16e-75b06cb4bd78",
+      "name": "Meeting Reply"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://server.smartlead.ai/api/v1/campaigns/{{ $('Set Email Body').item.json.campaignID }}/reply-email-thread?api_key={{ $('Set Email Body').item.json.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n\"email_stats_id\": $json.statsID,\n\"email_body\": $json.meetingReply,\n\"reply_message_id\": $json.replyMessageID,\n\"reply_email_time\": $json.timeReplied,\n\"reply_email_body\": $json.Received,\n\"cc\": $json.CC,\n\"bcc\": $json.BCC,\n\"add_signature\": \"false\"\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1500,
+        -320
+      ],
+      "id": "cd04b8d3-81ae-4fe7-8c70-f56ca89ab2c7",
+      "name": "Send Meeting Link"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "87ead8e5-c789-4651-b959-f7ff26d38caa",
+              "name": "messageReply",
+              "value": "={{ $json.message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "a9a47652-733a-457f-a409-44b01a8383d5",
+              "name": "toMail",
+              "value": "={{ $('Set Email Body').item.json.toMail }}",
+              "type": "string"
+            },
+            {
+              "id": "388ccafd-4f4f-429a-81d9-770debe0930d",
+              "name": "toName",
+              "value": "={{ $('Route Reply').item.json.toName }}",
+              "type": "string"
+            },
+            {
+              "id": "49efec98-9d41-40b6-a791-6107fff14fac",
+              "name": "toName",
+              "value": "={{ $('Set Email Body').item.json.toName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1400,
+        80
+      ],
+      "id": "bd9f670a-e89e-4aaa-9096-806fcb45d592",
+      "name": "Set Reply"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7b52c2c2-831f-4b62-ada9-300acbf3e9a5",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1040,
+        80
+      ],
+      "id": "48c3ddf3-8098-4a4f-b72f-8e26af209ab5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "message": "=You have received a reply from  {{ $('Set Email Body').item.json.toName }} ({{ $('Set Email Body').item.json.toMail }}) as follows:\n{{ $('Route Reply').item.json.Received }}\n\nAnd here's the CleverResponder generated reply. \n{{ $json.messageReply }}\n\nPlease use use the button below to approve or disapprove this message. If you approve it, then CleverResponder will send it as a reply.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Send",
+            "disapproveLabel": "Don't Send"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -1200,
+        80
+      ],
+      "id": "c627a6ba-649d-48d9-8709-c134e6e0731d",
+      "name": "Approve/Disapprove",
+      "webhookId": "a0ff7a6c-7dcb-4cb4-83cb-4ec349295623",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://server.smartlead.ai/api/v1/campaigns/{{ $('Set Email Body').item.json.campaignID }}/reply-email-thread?api_key={{ $('Set Email Body').item.json.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n\"email_stats_id\": $(\"Set Email Body\").item.json.statsID,\n\"email_body\": $('Set Reply').item.json.messageReply,\n\"reply_message_id\": $(\"Set Email Body\").item.json.replyMessageID,\n\"reply_email_time\": $(\"Receive Replies\").item.json.body.time_replied,\n\"reply_email_body\": $('Set Email Body').item.json.Received,\n\"cc\": \"\",\n\"bcc\": \"\",\n\"add_signature\": \"false\"\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -820,
+        -40
+      ],
+      "id": "ef329410-ae80-4ad7-b9c9-056273ab29ae",
+      "name": "Send Reply "
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "text": "Your message has been sent.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -640,
+        -40
+      ],
+      "id": "918371be-b01e-4656-b4ff-864390603a38",
+      "name": "Slack",
+      "webhookId": "c94ba691-4f65-4866-8fd0-d5968bd8e19b",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "text": "You have rejected the CleverResponder's suggested reply. You have to reply manually.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -820,
+        180
+      ],
+      "id": "e77523f7-f6d0-4997-9aae-609f05b5c6e8",
+      "name": "Manual Reply Notification",
+      "webhookId": "143156f6-4f0c-4997-b9a1-97ca81c0cdc0",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "message": "=Hey!\nA few days ago we sent a meeting booking link to {{ $('Route Reply').item.json.toName }} ({{ $('Route Reply').item.json.toMail }}) as they showed interest or requested meeting.\nAs a follow up, I am checking in with you, whether do you want me to send a friendly reminder to book a meeting?",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Send Reminder",
+            "disapproveLabel": "No Need"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -1140,
+        -320
+      ],
+      "id": "b22f1b39-f657-46dd-b4e9-4415c026a573",
+      "name": "Meeting Reminder Notification",
+      "webhookId": "31b81659-6622-49bf-9de0-bfda5c7ff036",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://server.smartlead.ai/api/v1/campaigns/{{ $('Set Email Body').item.json.campaignID }}/reply-email-thread?api_key={{ $('Set Email Body').item.json.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n\"email_stats_id\": $('Meeting Reply').item.json.statsID,\n\"email_body\": \"Hey! I sent you the following message a few days ago, but looks like you did not book a meeting. Please use the same link, and let's chat soon.\" + \"\\n\" + $('Meeting Reply').item.json.meetingReply,\n\"reply_message_id\": $json.replyMessageID,\n\"reply_email_time\": $('Meeting Reply').item.json.timeReplied,\n\"reply_email_body\": $('Meeting Reply').item.json.meetingReply,\n\"cc\": $json.CC,\n\"bcc\": $json.BCC,\n\"add_signature\": \"false\"\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        -400
+      ],
+      "id": "80dcea97-2187-4050-a20d-5fd02e74135a",
+      "name": "Meeting Book Reminder"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "71660651-bbbc-4bc8-aa3a-f6ca87fe43e7",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -940,
+        -320
+      ],
+      "id": "57cac44b-a7be-4d01-a5ab-c621cef5ced4",
+      "name": "Send Reminder?"
+    },
+    {
+      "parameters": {
+        "amount": 4
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1320,
+        -320
+      ],
+      "id": "5bae5a6a-213f-4c54-bbde-e9fa5999d582",
+      "name": "4 Days",
+      "webhookId": "00fd2bfd-f2b2-42f9-9810-1d2001edda3d"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "text": "Cool, Hope you have a great meeting!",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -720,
+        -220
+      ],
+      "id": "ece9e0e8-f5f7-44b7-9faa-7517d5e41635",
+      "name": "Good Luck for Meeting",
+      "webhookId": "2e870be6-3ca1-4a65-a5cf-c1957004b797",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Receive Replies": [
+      {
+        "json": {
+          "headers": {
+            "host": "cleverviral1.app.n8n.cloud",
+            "user-agent": "axios/0.19.2",
+            "content-length": "8238",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "52.62.221.205",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "AU",
+            "cf-ray": "945beb55164fe7e9-SYD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "52.62.221.205, 172.69.60.180",
+            "x-forwarded-host": "cleverviral1.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-18-7959cfc789-ft96v",
+            "x-is-trusted": "yes",
+            "x-real-ip": "52.62.221.205"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "campaign_status": "COMPLETED",
+            "stats_id": "163f553a-e2ca-4636-ae1e-da40b537dd20",
+            "sl_email_lead_id": "2142861777",
+            "sl_email_lead_map_id": 1755798443,
+            "sl_lead_email": "einstein1410@gmail.com",
+            "from_email": "krunal@cleverviral.co",
+            "cc_emails": [],
+            "subject": "AI powered Chatbot",
+            "sent_message_body": "<div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Hello Krunal&nbsp;</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don't hesitate to let us know.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Regards,</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">AutoResponder Team</div>",
+            "sent_message": {
+              "message_id": "<163f553a-e2ca-sl85-4636-ae1e-da40b537dd20@cleverviral.co>",
+              "html": "<div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Hello Krunal&nbsp;</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don't hesitate to let us know.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Regards,</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">AutoResponder Team</div>",
+              "text": "Hello Krunal \nWe are providing hight quality AI powered autoresponders/chatbots. Is your\ncompany or department looking for something like this? if so, don't hesitate to\nlet us know.\nRegards,\nAutoResponder Team",
+              "time": "2025-05-26T08:29:50.264+00:00"
+            },
+            "to_email": "einstein1410@gmail.com",
+            "to_name": "Krunalkumar Shah",
+            "time_replied": "2025-05-26T08:31:05+00:00",
+            "event_timestamp": "2025-05-26T08:31:05+00:00",
+            "reply_message": {
+              "message_id": "<CALBcyHWsx0Rnsnc_JU9+zgSe0J--DS9vEY3kY7BCAJU3J1TjYg@mail.gmail.com>",
+              "html": "<div dir=\"ltr\">That&#39;s quite interesting. Can you tell me more about it&#39;s functionality? I am also open to take a demo.</div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, May 26, 2025 at 1:59 PM Krunalkumar Shah &lt;<a href=\"mailto:krunal@cleverviral.co\">krunal@cleverviral.co</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><u></u>\n  \n  \n    \n    \n     \n      \n    \n  \n  \n  <div>\n  <div style=\"box-sizing:inherit\">Hello Krunal </div><div style=\"box-sizing:inherit\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don&#39;t hesitate to let us know.</div><div style=\"box-sizing:inherit\">Regards,</div><div style=\"box-sizing:inherit\">AutoResponder Team</div><img src=\"https://open.sleadtrack.com/image.png?messageId=%3C163f553a-e2ca-sl85-4636-ae1e-da40b537dd20@cleverviral.co%3E\" alt=\"line\">\n  </div>\n  \n  \n</blockquote></div><div><br clear=\"all\"></div><div><br></div><span class=\"gmail_signature_prefix\">-- </span><br><div dir=\"ltr\" class=\"gmail_signature\"><div dir=\"ltr\"><span style=\"color:rgb(34,34,34)\">Regards,</span><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">Krunalkumar Shah</span><br style=\"color:rgb(34,34,34)\"><a href=\"mailto:einstein1410@gmail.com\" style=\"color:rgb(17,85,204)\" target=\"_blank\">einstein1410@gmail.com</a><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">+91 82007 13617</span><br style=\"color:rgb(34,34,34)\"><a href=\"https://scholar.google.com/citations?user=dxFD3scAAAAJ\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://scholar.google.com/citations?user=dxFD3scAAAAJ</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.linkedin.com/in/realkrunalkumar\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://www.linkedin.com/in/realkrunalkumar</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.youracclaim.com/users/officialkrunalkumar/badges\" target=\"_blank\">https://www.youracclaim.com/users/officialkrunalkumar/badges<br style=\"color:rgb(34,34,34)\"></a><span style=\"color:rgb(34,34,34)\"><a href=\"https://krunalkumar.vercel.app\" target=\"_blank\">https://krunalkumar.vercel.app</a></span></div></div>\n",
+              "text": "That's quite interesting. Can you tell me more about it's functionality? I\nam also open to take a demo.\n",
+              "time": "2025-05-26T08:31:05+00:00"
+            },
+            "reply_body": "<div dir=\"ltr\">That&#39;s quite interesting. Can you tell me more about it&#39;s functionality? I am also open to take a demo.</div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, May 26, 2025 at 1:59 PM Krunalkumar Shah &lt;<a href=\"mailto:krunal@cleverviral.co\">krunal@cleverviral.co</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><u></u>\n  \n  \n    \n    \n     \n      \n    \n  \n  \n  <div>\n  <div style=\"box-sizing:inherit\">Hello Krunal </div><div style=\"box-sizing:inherit\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don&#39;t hesitate to let us know.</div><div style=\"box-sizing:inherit\">Regards,</div><div style=\"box-sizing:inherit\">AutoResponder Team</div><img src=\"https://open.sleadtrack.com/image.png?messageId=%3C163f553a-e2ca-sl85-4636-ae1e-da40b537dd20@cleverviral.co%3E\" alt=\"line\">\n  </div>\n  \n  \n</blockquote></div><div><br clear=\"all\"></div><div><br></div><span class=\"gmail_signature_prefix\">-- </span><br><div dir=\"ltr\" class=\"gmail_signature\"><div dir=\"ltr\"><span style=\"color:rgb(34,34,34)\">Regards,</span><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">Krunalkumar Shah</span><br style=\"color:rgb(34,34,34)\"><a href=\"mailto:einstein1410@gmail.com\" style=\"color:rgb(17,85,204)\" target=\"_blank\">einstein1410@gmail.com</a><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">+91 82007 13617</span><br style=\"color:rgb(34,34,34)\"><a href=\"https://scholar.google.com/citations?user=dxFD3scAAAAJ\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://scholar.google.com/citations?user=dxFD3scAAAAJ</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.linkedin.com/in/realkrunalkumar\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://www.linkedin.com/in/realkrunalkumar</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.youracclaim.com/users/officialkrunalkumar/badges\" target=\"_blank\">https://www.youracclaim.com/users/officialkrunalkumar/badges<br style=\"color:rgb(34,34,34)\"></a><span style=\"color:rgb(34,34,34)\"><a href=\"https://krunalkumar.vercel.app\" target=\"_blank\">https://krunalkumar.vercel.app</a></span></div></div>\n",
+            "message_id": "<CALBcyHWsx0Rnsnc_JU9+zgSe0J--DS9vEY3kY7BCAJU3J1TjYg@mail.gmail.com>",
+            "preview_text": "That's quite interesting. Can you tell me more about it's functionality? I\nam also open to take a demo.\n",
+            "campaign_name": "AI Responder",
+            "campaign_id": 2027876,
+            "client_id": 50971,
+            "sequence_number": 1,
+            "secret_key": "403d0b6c-1316-4a5a-97a1-fb2eb10678c1",
+            "reply_category": 1,
+            "app_url": "https://app.smartlead.ai/app/master-inbox?leadMap=1755798443",
+            "ui_master_inbox_link": "https://app.smartlead.ai/app/master-inbox?leadMap=1755798443",
+            "description": "einstein1410@gmail.com replied to Email 1 for campaign - AI Responder ",
+            "metadata": {
+              "webhook_created_at": "2025-05-07T15:18:40.465Z"
+            },
+            "promptType": "sl-prompt",
+            "leadCorrespondence": {
+              "targetLeadEmail": "einstein1410@gmail.com",
+              "replyReceivedFrom": "einstein1410@gmail.com",
+              "repliedCompanyDomain": "SameCompany"
+            },
+            "webhook_url": "https://cleverviral1.app.n8n.cloud/webhook/c59de1ca-facd-40bc-bc04-352d3914a4af",
+            "webhook_id": 192580,
+            "webhook_name": "CleverResponder",
+            "event_type": "EMAIL_REPLY"
+          },
+          "webhookUrl": "https://cleverviral1.app.n8n.cloud/webhook/c59de1ca-facd-40bc-bc04-352d3914a4af",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Receive Replies": {
+      "main": [
+        [
+          {
+            "node": "Set Email Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suggest Replies": {
+      "main": [
+        [
+          {
+            "node": "Set Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Email Body": {
+      "main": [
+        [
+          {
+            "node": "Route Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cleverviral": {
+      "ai_tool": [
+        [
+          {
+            "node": "Suggest Replies",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Reply": {
+      "main": [
+        [
+          {
+            "node": "Meeting Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meeting Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "node": "Suggest Replies",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "node": "Suggest Replies",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "Suggest Replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Reply": {
+      "main": [
+        [
+          {
+            "node": "Send Meeting Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Reply": {
+      "main": [
+        [
+          {
+            "node": "Approve/Disapprove",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approve/Disapprove": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send Reply ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Manual Reply Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reply ": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Meeting Link": {
+      "main": [
+        [
+          {
+            "node": "4 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Reminder Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder?": {
+      "main": [
+        [
+          {
+            "node": "Meeting Book Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Good Luck for Meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4 Days": {
+      "main": [
+        [
+          {
+            "node": "Meeting Reminder Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Book Reminder": {
+      "main": [
+        [
+          {
+            "node": "4 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "266dad7e-7b01-48cf-af1c-c5de6fc1ee42",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "155e035c269e06721be15adcca16a8df7ca2f440e69e53064795835bd4a74fd8"
+  },
+  "id": "FF8XHer1nudkvEkI",
+  "tags": []
+}
