@@ -606,7 +606,7 @@
             {
               "id": "87ead8e5-c789-4651-b959-f7ff26d38caa",
               "name": "messageReply",
-              "value": "={{ $json.message.content }}",
+              "value": "={{ $json.message.content.replace(/\\n/g,\"<br>\") }}",
               "type": "string"
             },
             {
@@ -850,7 +850,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{\n{\n\"email_stats_id\": $('Meeting Reply').item.json.statsID,\n\"email_body\": \"Hey! I sent you the following message a few days ago, but looks like you did not book a meeting. Please use the same link, and let's chat soon.\" + \"\\n\" + $('Meeting Reply').item.json.meetingReply,\n\"reply_message_id\": $json.replyMessageID,\n\"reply_email_time\": $('Meeting Reply').item.json.timeReplied,\n\"reply_email_body\": $('Meeting Reply').item.json.meetingReply,\n\"cc\": $json.CC,\n\"bcc\": $json.BCC,\n\"add_signature\": \"false\"\n}\n}}",
+        "jsonBody": "={{\n{\n\"email_stats_id\": $('Meeting Reply').item.json.statsID,\n\"email_body\": \"Hey! <br> I sent you the following message a few days ago, but looks like you did not book a meeting. Please use the same link, and let's chat soon.\" + \"<br> FYI, Below is the message I sent <br><br>\" + $('Meeting Reply').item.json.meetingReply,\n\"reply_message_id\": $json.replyMessageID,\n\"reply_email_time\": $('Meeting Reply').item.json.timeReplied,\n\"reply_email_body\": $('Meeting Reply').item.json.meetingReply,\n\"cc\": $json.CC,\n\"bcc\": $json.BCC,\n\"add_signature\": \"false\"\n}\n}}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -940,6 +940,181 @@
           "name": "Slack - Cleverviral"
         }
       }
+    },
+    {
+      "parameters": {
+        "amount": 4
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        -60
+      ],
+      "id": "7bcc14cc-f69f-4988-a9d3-5dc0f61a342d",
+      "name": "4 Days Wait",
+      "webhookId": "2386a4db-92c0-4db3-ac5c-6c542c9a566d"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9fea57b2-1b87-4e32-8e29-29ba86da7427",
+              "leftValue": "={{ $('Set Reply').item.json.messageReply }}",
+              "rightValue": "={{ $('Route Reply').item.json.meetingLink }}",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -460,
+        -40
+      ],
+      "id": "6c9a9349-6d43-4e4a-8e9d-a79c98ebb0ef",
+      "name": "Meeting Link Included?"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "message": "=Hello,\nBefore a few days, we sent a meeting booking link to {{ $('Set Reply').item.json.toName }} ({{ $('Set Reply').item.json.toMail }}). Just checking to see if they have booked a meeting. If not, I can simply send a friendly reminder to book a meeting.\nUse the below button either to send a meeting reminder or not.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Send Reminder",
+            "disapproveLabel": "No Need"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -40,
+        -60
+      ],
+      "id": "43caa9b3-f079-4845-8040-63135d8d7450",
+      "name": "Meeting Reminder",
+      "webhookId": "31b81659-6622-49bf-9de0-bfda5c7ff036",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08QNAFRU73",
+          "mode": "list",
+          "cachedResultName": "krunal"
+        },
+        "text": "Cool, Hope you have a great meeting!",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        100
+      ],
+      "id": "63846cc4-82a6-47b5-a1b5-dfcf4c35c305",
+      "name": "Good Luck for Meeting Text",
+      "webhookId": "2e870be6-3ca1-4a65-a5cf-c1957004b797",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "qxYXHqg5Vawbjezu",
+          "name": "Slack - Cleverviral"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "53a58944-cf6c-446b-be06-12a893484fc9",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        140,
+        -60
+      ],
+      "id": "1cc522a3-685d-4050-b66f-446dd3a0bd0e",
+      "name": "Check"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://server.smartlead.ai/api/v1/campaigns/{{ $('Set Email Body').item.json.campaignID }}/reply-email-thread?api_key={{ $('Set Email Body').item.json.apiKey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n\"email_stats_id\": $('Set Email Body').item.json.statsID,\n\"email_body\": \"Hey! <br> I sent you the following message a few days ago, but looks like you did not book a meeting. Please use the same link, and let's chat soon.\" + $('Route Reply').item.json.meetingLink,\n\"reply_message_id\": $('Set Email Body').item.json.replyMessageID,\n\"reply_email_time\": $('Receive Replies').item.json.body.time_replied,\n\"reply_email_body\": $('Set Reply').item.json.messageReply.replace(/\\n/g,\"<br>\"),\n\"cc\": $('Set Email Body').item.json.CC,\n\"bcc\": $('Set Email Body').item.json.BCC,\n\"add_signature\": \"false\"\n}\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        -260
+      ],
+      "id": "62757821-c995-449c-a5db-4c502b480d24",
+      "name": "Send Meeting Reminder"
     }
   ],
   "pinData": {
@@ -949,73 +1124,67 @@
           "headers": {
             "host": "cleverviral1.app.n8n.cloud",
             "user-agent": "axios/0.19.2",
-            "content-length": "8238",
+            "content-length": "10213",
             "accept": "application/json, text/plain, */*",
             "accept-encoding": "gzip, br",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
-            "cf-connecting-ip": "52.62.221.205",
+            "cf-connecting-ip": "13.211.116.102",
             "cf-ew-via": "15",
             "cf-ipcountry": "AU",
-            "cf-ray": "945beb55164fe7e9-SYD",
+            "cf-ray": "944b0d9c16e7e7f0-SYD",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "x-forwarded-for": "52.62.221.205, 172.69.60.180",
+            "x-forwarded-for": "13.211.116.102, 172.69.60.197",
             "x-forwarded-host": "cleverviral1.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-18-7959cfc789-ft96v",
+            "x-forwarded-server": "traefik-prod-users-gwc-18-7959cfc789-hw6gf",
             "x-is-trusted": "yes",
-            "x-real-ip": "52.62.221.205"
+            "x-real-ip": "13.211.116.102"
           },
           "params": {},
           "query": {},
           "body": {
-            "campaign_status": "COMPLETED",
-            "stats_id": "163f553a-e2ca-4636-ae1e-da40b537dd20",
-            "sl_email_lead_id": "2142861777",
-            "sl_email_lead_map_id": 1755798443,
+            "stats_id": "c4063209-0a1d-4507-9143-dec01de49a31",
+            "stats_thread_id": 13557846,
+            "sl_email_lead_id": "2139830276",
+            "sl_email_lead_map_id": "1753157271",
             "sl_lead_email": "einstein1410@gmail.com",
             "from_email": "krunal@cleverviral.co",
             "cc_emails": [],
-            "subject": "AI powered Chatbot",
-            "sent_message_body": "<div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Hello Krunal&nbsp;</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don't hesitate to let us know.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Regards,</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">AutoResponder Team</div>",
+            "subject": "Information Technology Service",
+            "sent_message_body": "<div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Hello Krunal&nbsp;</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">This is via smartlead.</div><div  fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Our company is providing various information technology related services. Are you interested? Here's the list of services:</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">1) Website Development</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">2) Cybersecurity</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">3) CRM and workflow automation</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">4) Multimedia</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">5) Human Resource</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">If you decide to go with our services then we can give you a massive discount/discounts on the services.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Feel free to reach.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Best,</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">IT Services Pvt Ltd</div>",
             "sent_message": {
-              "message_id": "<163f553a-e2ca-sl85-4636-ae1e-da40b537dd20@cleverviral.co>",
-              "html": "<div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Hello Krunal&nbsp;</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don't hesitate to let us know.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Regards,</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">AutoResponder Team</div>",
-              "text": "Hello Krunal \nWe are providing hight quality AI powered autoresponders/chatbots. Is your\ncompany or department looking for something like this? if so, don't hesitate to\nlet us know.\nRegards,\nAutoResponder Team",
-              "time": "2025-05-26T08:29:50.264+00:00"
+              "message_id": "<c4063209-0a1d-sl64-4507-9143-dec01de49a31@cleverviral.co>",
+              "html": "<div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Hello Krunal&nbsp;</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">This is via smartlead.</div><div  fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Our company is providing various information technology related services. Are you interested? Here's the list of services:</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">1) Website Development</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">2) Cybersecurity</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">3) CRM and workflow automation</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">4) Multimedia</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">5) Human Resource</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">If you decide to go with our services then we can give you a massive discount/discounts on the services.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Feel free to reach.</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">Best,</div><div fr-original-style=\"\" style=\"-webkit-tap-highlight-color: transparent; box-sizing: inherit;\">IT Services Pvt Ltd</div>",
+              "text": "Hello Krunal \nThis is via smartlead.\nOur company is providing various information technology related services. Are\nyou interested? Here's the list of services:\n1) Website Development\n2) Cybersecurity\n3) CRM and workflow automation\n4) Multimedia\n5) Human Resource\nIf you decide to go with our services then we can give you a massive\ndiscount/discounts on the services.\nFeel free to reach.\nBest,\nIT Services Pvt Ltd",
+              "time": "2025-05-24T07:21:48.157Z"
             },
             "to_email": "einstein1410@gmail.com",
             "to_name": "Krunalkumar Shah",
-            "time_replied": "2025-05-26T08:31:05+00:00",
-            "event_timestamp": "2025-05-26T08:31:05+00:00",
+            "time_replied": "2025-05-24T07:23:43+00:00",
+            "event_timestamp": "2025-05-24T07:23:43+00:00",
+            "reply_body": "<div dir=\"ltr\">Thanks! I will book a call later this week.</div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Sat, May 24, 2025 at 12:53 PM Krunalkumar Shah &lt;<a href=\"mailto:krunal@cleverviral.co\">krunal@cleverviral.co</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\">Hey Krunalkumar Shah,\nPlease use the following link to book sometime.\n<a href=\"https://www.calendly.com\" target=\"_blank\">https://www.calendly.com</a>\nTalk soon!<br><div class=\"gmail_quote\">\n        <div>\n          On Sat, May 24, 2025 at 07:22 AM UTC Krunal Shah &lt;<a href=\"http://einstein1410@gmail.com\" target=\"_blank\">einstein1410@gmail.com</a>&gt;  wrote:<br>\n        </div>\n        <blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\">Hey!\nYeah, I&#39;m interested. I would like to get a demo.\n</blockquote>\n        </div>\n</blockquote></div><div><br clear=\"all\"></div><div><br></div><span class=\"gmail_signature_prefix\">-- </span><br><div dir=\"ltr\" class=\"gmail_signature\"><div dir=\"ltr\"><span style=\"color:rgb(34,34,34)\">Regards,</span><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">Krunalkumar Shah</span><br style=\"color:rgb(34,34,34)\"><a href=\"mailto:einstein1410@gmail.com\" style=\"color:rgb(17,85,204)\" target=\"_blank\">einstein1410@gmail.com</a><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">+91 82007 13617</span><br style=\"color:rgb(34,34,34)\"><a href=\"https://scholar.google.com/citations?user=dxFD3scAAAAJ\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://scholar.google.com/citations?user=dxFD3scAAAAJ</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.linkedin.com/in/realkrunalkumar\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://www.linkedin.com/in/realkrunalkumar</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.youracclaim.com/users/officialkrunalkumar/badges\" target=\"_blank\">https://www.youracclaim.com/users/officialkrunalkumar/badges<br style=\"color:rgb(34,34,34)\"></a><span style=\"color:rgb(34,34,34)\"><a href=\"https://krunalkumar.vercel.app\" target=\"_blank\">https://krunalkumar.vercel.app</a></span></div></div>\n",
             "reply_message": {
-              "message_id": "<CALBcyHWsx0Rnsnc_JU9+zgSe0J--DS9vEY3kY7BCAJU3J1TjYg@mail.gmail.com>",
-              "html": "<div dir=\"ltr\">That&#39;s quite interesting. Can you tell me more about it&#39;s functionality? I am also open to take a demo.</div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, May 26, 2025 at 1:59 PM Krunalkumar Shah &lt;<a href=\"mailto:krunal@cleverviral.co\">krunal@cleverviral.co</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><u></u>\n  \n  \n    \n    \n     \n      \n    \n  \n  \n  <div>\n  <div style=\"box-sizing:inherit\">Hello Krunal </div><div style=\"box-sizing:inherit\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don&#39;t hesitate to let us know.</div><div style=\"box-sizing:inherit\">Regards,</div><div style=\"box-sizing:inherit\">AutoResponder Team</div><img src=\"https://open.sleadtrack.com/image.png?messageId=%3C163f553a-e2ca-sl85-4636-ae1e-da40b537dd20@cleverviral.co%3E\" alt=\"line\">\n  </div>\n  \n  \n</blockquote></div><div><br clear=\"all\"></div><div><br></div><span class=\"gmail_signature_prefix\">-- </span><br><div dir=\"ltr\" class=\"gmail_signature\"><div dir=\"ltr\"><span style=\"color:rgb(34,34,34)\">Regards,</span><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">Krunalkumar Shah</span><br style=\"color:rgb(34,34,34)\"><a href=\"mailto:einstein1410@gmail.com\" style=\"color:rgb(17,85,204)\" target=\"_blank\">einstein1410@gmail.com</a><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">+91 82007 13617</span><br style=\"color:rgb(34,34,34)\"><a href=\"https://scholar.google.com/citations?user=dxFD3scAAAAJ\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://scholar.google.com/citations?user=dxFD3scAAAAJ</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.linkedin.com/in/realkrunalkumar\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://www.linkedin.com/in/realkrunalkumar</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.youracclaim.com/users/officialkrunalkumar/badges\" target=\"_blank\">https://www.youracclaim.com/users/officialkrunalkumar/badges<br style=\"color:rgb(34,34,34)\"></a><span style=\"color:rgb(34,34,34)\"><a href=\"https://krunalkumar.vercel.app\" target=\"_blank\">https://krunalkumar.vercel.app</a></span></div></div>\n",
-              "text": "That's quite interesting. Can you tell me more about it's functionality? I\nam also open to take a demo.\n",
-              "time": "2025-05-26T08:31:05+00:00"
+              "message_id": "<CALBcyHWCMhwyG64-qj9E1aN88goSgo1NXuAqmKFt6TLra269Kg@mail.gmail.com>",
+              "html": "<div dir=\"ltr\">Thanks! I will book a call later this week.</div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Sat, May 24, 2025 at 12:53 PM Krunalkumar Shah &lt;<a href=\"mailto:krunal@cleverviral.co\">krunal@cleverviral.co</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\">Hey Krunalkumar Shah,\nPlease use the following link to book sometime.\n<a href=\"https://www.calendly.com\" target=\"_blank\">https://www.calendly.com</a>\nTalk soon!<br><div class=\"gmail_quote\">\n        <div>\n          On Sat, May 24, 2025 at 07:22 AM UTC Krunal Shah &lt;<a href=\"http://einstein1410@gmail.com\" target=\"_blank\">einstein1410@gmail.com</a>&gt;  wrote:<br>\n        </div>\n        <blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\">Hey!\nYeah, I&#39;m interested. I would like to get a demo.\n</blockquote>\n        </div>\n</blockquote></div><div><br clear=\"all\"></div><div><br></div><span class=\"gmail_signature_prefix\">-- </span><br><div dir=\"ltr\" class=\"gmail_signature\"><div dir=\"ltr\"><span style=\"color:rgb(34,34,34)\">Regards,</span><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">Krunalkumar Shah</span><br style=\"color:rgb(34,34,34)\"><a href=\"mailto:einstein1410@gmail.com\" style=\"color:rgb(17,85,204)\" target=\"_blank\">einstein1410@gmail.com</a><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">+91 82007 13617</span><br style=\"color:rgb(34,34,34)\"><a href=\"https://scholar.google.com/citations?user=dxFD3scAAAAJ\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://scholar.google.com/citations?user=dxFD3scAAAAJ</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.linkedin.com/in/realkrunalkumar\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://www.linkedin.com/in/realkrunalkumar</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.youracclaim.com/users/officialkrunalkumar/badges\" target=\"_blank\">https://www.youracclaim.com/users/officialkrunalkumar/badges<br style=\"color:rgb(34,34,34)\"></a><span style=\"color:rgb(34,34,34)\"><a href=\"https://krunalkumar.vercel.app\" target=\"_blank\">https://krunalkumar.vercel.app</a></span></div></div>\n",
+              "text": "Thanks! I will book a call later this week.\n",
+              "time": "2025-05-24T07:23:43+00:00"
             },
-            "reply_body": "<div dir=\"ltr\">That&#39;s quite interesting. Can you tell me more about it&#39;s functionality? I am also open to take a demo.</div><br><div class=\"gmail_quote gmail_quote_container\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, May 26, 2025 at 1:59 PM Krunalkumar Shah &lt;<a href=\"mailto:krunal@cleverviral.co\">krunal@cleverviral.co</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex\"><u></u>\n  \n  \n    \n    \n     \n      \n    \n  \n  \n  <div>\n  <div style=\"box-sizing:inherit\">Hello Krunal </div><div style=\"box-sizing:inherit\">We are providing hight quality AI powered autoresponders/chatbots. Is your company or department looking for something like this? if so, don&#39;t hesitate to let us know.</div><div style=\"box-sizing:inherit\">Regards,</div><div style=\"box-sizing:inherit\">AutoResponder Team</div><img src=\"https://open.sleadtrack.com/image.png?messageId=%3C163f553a-e2ca-sl85-4636-ae1e-da40b537dd20@cleverviral.co%3E\" alt=\"line\">\n  </div>\n  \n  \n</blockquote></div><div><br clear=\"all\"></div><div><br></div><span class=\"gmail_signature_prefix\">-- </span><br><div dir=\"ltr\" class=\"gmail_signature\"><div dir=\"ltr\"><span style=\"color:rgb(34,34,34)\">Regards,</span><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">Krunalkumar Shah</span><br style=\"color:rgb(34,34,34)\"><a href=\"mailto:einstein1410@gmail.com\" style=\"color:rgb(17,85,204)\" target=\"_blank\">einstein1410@gmail.com</a><br style=\"color:rgb(34,34,34)\"><span style=\"color:rgb(34,34,34)\">+91 82007 13617</span><br style=\"color:rgb(34,34,34)\"><a href=\"https://scholar.google.com/citations?user=dxFD3scAAAAJ\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://scholar.google.com/citations?user=dxFD3scAAAAJ</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.linkedin.com/in/realkrunalkumar\" style=\"color:rgb(17,85,204)\" target=\"_blank\">https://www.linkedin.com/in/realkrunalkumar</a><br style=\"color:rgb(34,34,34)\"><a href=\"https://www.youracclaim.com/users/officialkrunalkumar/badges\" target=\"_blank\">https://www.youracclaim.com/users/officialkrunalkumar/badges<br style=\"color:rgb(34,34,34)\"></a><span style=\"color:rgb(34,34,34)\"><a href=\"https://krunalkumar.vercel.app\" target=\"_blank\">https://krunalkumar.vercel.app</a></span></div></div>\n",
-            "message_id": "<CALBcyHWsx0Rnsnc_JU9+zgSe0J--DS9vEY3kY7BCAJU3J1TjYg@mail.gmail.com>",
-            "preview_text": "That's quite interesting. Can you tell me more about it's functionality? I\nam also open to take a demo.\n",
-            "campaign_name": "AI Responder",
-            "campaign_id": 2027876,
+            "message_id": "<CALBcyHWCMhwyG64-qj9E1aN88goSgo1NXuAqmKFt6TLra269Kg@mail.gmail.com>",
+            "preview_text": "Thanks! I will book a call later this week.\n",
+            "campaign_name": "Clever Responder AI",
+            "campaign_id": 2022486,
+            "campaign_status": "ACTIVE",
             "client_id": 50971,
             "sequence_number": 1,
             "secret_key": "403d0b6c-1316-4a5a-97a1-fb2eb10678c1",
-            "reply_category": 1,
-            "app_url": "https://app.smartlead.ai/app/master-inbox?leadMap=1755798443",
-            "ui_master_inbox_link": "https://app.smartlead.ai/app/master-inbox?leadMap=1755798443",
-            "description": "einstein1410@gmail.com replied to Email 1 for campaign - AI Responder ",
+            "app_url": "https://app.smartlead.ai/app/master-inbox?leadMap=1753157271",
+            "ui_master_inbox_link": "https://app.smartlead.ai/app/master-inbox?leadMap=1753157271",
+            "description": "einstein1410@gmail.com replied to Thread Email 1 for campaign - Clever Responder AI",
             "metadata": {
               "webhook_created_at": "2025-05-07T15:18:40.465Z"
-            },
-            "promptType": "sl-prompt",
-            "leadCorrespondence": {
-              "targetLeadEmail": "einstein1410@gmail.com",
-              "replyReceivedFrom": "einstein1410@gmail.com",
-              "repliedCompanyDomain": "SameCompany"
             },
             "webhook_url": "https://cleverviral1.app.n8n.cloud/webhook/c59de1ca-facd-40bc-bc04-352d3914a4af",
             "webhook_id": 192580,
@@ -1242,13 +1411,86 @@
           }
         ]
       ]
+    },
+    "Slack": {
+      "main": [
+        [
+          {
+            "node": "Meeting Link Included?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4 Days Wait": {
+      "main": [
+        [
+          {
+            "node": "Meeting Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Link Included?": {
+      "main": [
+        [
+          {
+            "node": "4 Days Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Reminder": {
+      "main": [
+        [
+          {
+            "node": "Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check": {
+      "main": [
+        [
+          {
+            "node": "Send Meeting Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Good Luck for Meeting Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Meeting Reminder": {
+      "main": [
+        [
+          {
+            "node": "4 Days Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "266dad7e-7b01-48cf-af1c-c5de6fc1ee42",
+  "versionId": "8ebe7307-38b6-4684-85b1-5d6aec1f3de5",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "155e035c269e06721be15adcca16a8df7ca2f440e69e53064795835bd4a74fd8"
